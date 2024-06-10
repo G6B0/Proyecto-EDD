@@ -97,6 +97,30 @@ string decoding(vector<code> v){
 	return tex;
 }
 
+void test(const string& text, int labs, int sbs, int n_veces) {
+    for (int i = 0; i < n_veces; i++) {
+        auto start = high_resolution_clock::now();
+        vector<code> op = encoding(text, labs, sbs);
+        auto stop = high_resolution_clock::now();
+
+        auto duration = duration_cast<microseconds>(stop - start);
+
+        size_t memoria = memoria_usada(op);
+
+        cout << "Test " << i + 1 << ":\n";
+        cout << "Encoding Time: " << duration.count() << " microseconds\n";
+        cout << "Memory Used: " << memoria << " bytes\n";
+
+        auto start_decoding = high_resolution_clock::now();
+        string tex = decoding(op);
+        auto stop_decoding = high_resolution_clock::now();
+        auto duration_decoding = duration_cast<microseconds>(stop_decoding - start_decoding);
+
+        cout << "Decoder Output: " << tex << endl;
+        cout << "Decoding Time: " << duration_decoding.count() << " microseconds\n";
+        cout << "-----------------------------------------\n";
+    }
+}
 
 
 int main(){
@@ -110,6 +134,16 @@ int main(){
 	string text;
 	cout<<"Enter text: ";
 	getline(cin,text);
+
+	int n_veces;
+    cout << "Ingrese el numero de test a realizar";
+    cin >> n_veces;
+
+    test(text, labs, sbs, n_veces);
+    test(text, labs, sbs, n_veces);
+    test(text, labs, sbs, n_veces);
+    test(text, labs, sbs, n_veces);
+    test(text, labs, sbs, n_veces);
 
 	return 0;
 
