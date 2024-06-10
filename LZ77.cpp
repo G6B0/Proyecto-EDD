@@ -119,6 +119,19 @@ void test(const string& text, int labs, int sbs, int n_veces) {
         cout << "Decoder Output: " << tex << endl;
         cout << "Decoding Time: " << duration_decoding.count() << " microseconds\n";
         cout << "-----------------------------------------\n";
+
+        int LongitudMin = std::min(text.size(), tex.size());
+        int LongitudMax = std::max(text.size(), tex.size());
+
+        int contador = 0;
+
+        for (int i = 0; i < LongitudMin; ++i) {
+        if (text[i] == tex[i]) {
+            contador++;
+            }
+        }
+        double Porcentaje_Igualdad = (static_cast<double>(contador) / LongitudMax) * 100.0;
+        std::cout << "El porcentaje de igualdad es: " << Porcentaje_Igualdad << "%" << std::endl;
     }
 }
 
@@ -139,10 +152,6 @@ int main(){
     cout << "Ingrese el numero de test a realizar";
     cin >> n_veces;
 
-    test(text, labs, sbs, n_veces);
-    test(text, labs, sbs, n_veces);
-    test(text, labs, sbs, n_veces);
-    test(text, labs, sbs, n_veces);
     test(text, labs, sbs, n_veces);
 
 	return 0;
