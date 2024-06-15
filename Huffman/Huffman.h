@@ -32,9 +32,7 @@ private:
             node* nodo = new node(string(1, e.first), e.second);
             listaDeNodos.push_back(nodo);
         }
-        sort(listaDeNodos.begin(), listaDeNodos.end(), [](node* a, node* b) {
-            return a->frecuencia < b->frecuencia;
-        });
+        sort(listaDeNodos.begin(), listaDeNodos.end(), [](node* a, node* b) {return a->frecuencia < b->frecuencia;});
         return listaDeNodos;
     }
 
@@ -57,7 +55,9 @@ private:
             generaCodigos(r->derecha);
         }
     }
-
+/**
+ * guarda cada nodo del arbor en una tabla hash 
+ */
     unordered_map<string, node*> obtenerDiccNodos(node* r, unordered_map<string, node*>& elementos) {
         if (elementos.find(r->nombre) == elementos.end()) {
             elementos[r->nombre] = r;
@@ -70,7 +70,10 @@ private:
         }
         return elementos;
     }
-
+/**
+ * Convierte el diccionario de nodos en un diccionario donde las 
+ * claves son los nombres de los nodos y los valores son sus códigos.
+ */
     unordered_map<string, string> obtenerMapaDeCodigos(const unordered_map<string, node*>& d) {
         unordered_map<string, string> nombreYCodigo;
         for (const auto& e : d) {
@@ -79,7 +82,9 @@ private:
         }
         return nombreYCodigo;
     }
-
+/**
+ * Crea un mapa de vértices (pares de nombres de nodos) con su frecuencia en un árbol binario.
+ */
     map<pair<string, string>, int> obtenerVertices(node* nodo, node* padre) {
         if (padre != nullptr) {
             vertices[make_pair(padre->nombre, nodo->nombre)] = nodo->frecuencia;
@@ -97,7 +102,6 @@ public:
     Huffman() : ARBOL(nullptr) {}
 
     ~Huffman() {
-        // Destructor para liberar memoria
         limpiarArbol(ARBOL);
     }
 
@@ -126,7 +130,7 @@ public:
         ARBOL = lista[0];
         generaCodigos(ARBOL);
         elementos = obtenerDiccNodos(ARBOL, elementos);
-        codigos = obtenerMapaDeCodigos(elementos);
+        codigos = obtenerMapaDeCodigos(elementos);  
     }
 
     string codificar(const string& texto) {

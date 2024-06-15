@@ -19,8 +19,5 @@ public:
         this->derecha = derecha;
         this->codigo = "";
     }
-    
-   bool operator<(const node& other) const {
-        return frecuencia > other.frecuencia;
-    }
+
 };

@@ -53,8 +53,8 @@ int main() {
             string textoDecodificado = huffman.decodificar(textoCodificado);
             auto finDecodificacion = high_resolution_clock::now();
 
-            auto duracionCodificacion = duration_cast<nanoseconds>(finCodificacion - inicioCodificacion).count();
-            auto duracionDecodificacion = duration_cast<nanoseconds>(finDecodificacion - inicioDecodificacion).count();
+            auto duracionCodificacion = duration_cast<microseconds>(finCodificacion - inicioCodificacion).count();
+            auto duracionDecodificacion = duration_cast<microseconds>(finDecodificacion - inicioDecodificacion).count();
 
             tiemposCodificacion.push_back(duracionCodificacion);
             tiemposDecodificacion.push_back(duracionDecodificacion);
@@ -74,11 +74,7 @@ int main() {
 
         double promedioCodificacion = static_cast<double>(sumaCodificacion) / numRepeticiones;
         double promedioDecodificacion = static_cast<double>(sumaDecodificacion) / numRepeticiones;
-
-        cout << "Resultados para tamaño " << tamañoMB << " MB:" << endl;
-        cout << "Tiempo promedio de codificación: " << promedioCodificacion << " ns" << endl;
-        cout << "Tiempo promedio de decodificación: " << promedioDecodificacion << " ns" << endl;
-
+        
         // Escribir los resultados en el archivo CSV
         archivoCSV.open(nombreArchivoCSV, ios::app);
         if (!archivoCSV.is_open()) {
