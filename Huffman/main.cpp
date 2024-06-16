@@ -26,12 +26,15 @@ int main() {
         cerr << "No se pudo abrir el archivo CSV para escribir la cabecera." << endl;
         return 1;
     }
-    archivoCSV << "cant_experimento;estructura_dato;tipo_consulta;tamaño_en_MB;tiempo_promedio\n";
+    archivoCSV << "cant_experimento;estructura_dato;tipo_consulta;largo_string_ingresado_en_MB;tiempo_promedio;tamaño_codificado_en_MB\n";
     archivoCSV.close();
 
     for (size_t tamañoMB : tamañosEnMB) {
-        size_t tamanioEnBytes = tamañoMB * 1024 * 1024; // Convertir MB a bytes
+        size_t tamanioEnBytes = tamañoMB * 1e6; // Convertir MB a bytes
         string textoOriginal = leerArchivo(rutaArchivoOriginal, tamanioEnBytes);
+        size_t textoOriginalTmaño = textoOriginal.length();
+        std::cout<<textoOriginalTmaño<<std::endl;
+
 
         if (textoOriginal.empty()) {
             cerr << "Error al leer el archivo para el tamaño de " << tamañoMB << " MB." << endl;
@@ -40,7 +43,6 @@ int main() {
 
         Huffman huffman;
         huffman.construirArbol(textoOriginal);
-
         vector<long long> tiemposCodificacion;
         vector<long long> tiemposDecodificacion;
 
@@ -74,15 +76,15 @@ int main() {
 
         double promedioCodificacion = static_cast<double>(sumaCodificacion) / numRepeticiones;
         double promedioDecodificacion = static_cast<double>(sumaDecodificacion) / numRepeticiones;
-        
-        // Escribir los resultados en el archivo CSV
+        double espacioCodificadoMB = huffman.tamañoCodificadoEnMB();
+        double espacioOriginalMB = static_cast<double>(textoOriginalTmaño) / (1e6);
         archivoCSV.open(nombreArchivoCSV, ios::app);
         if (!archivoCSV.is_open()) {
             cerr << "No se pudo abrir el archivo CSV para escribir los resultados." << endl;
             return 1;
         }
-        archivoCSV<<numRepeticiones<<";"<<"Huffman"<<";"<<"codificacion"<<";"<<tamañoMB<<";"<< promedioCodificacion <<endl;
-        archivoCSV<<numRepeticiones<<";"<<"Huffman"<<";"<<"decodificacion"<<";"<<tamañoMB<<";"<<promedioDecodificacion <<endl;;
+        archivoCSV<<numRepeticiones<<";"<<"Huffman"<<";"<<"codificacion"<<";"<<espacioOriginalMB<<";"<< promedioCodificacion<<";" <<espacioCodificadoMB<<"\n";
+        archivoCSV<<numRepeticiones<<";"<<"Huffman"<<";"<<"decodificacion"<<";"<<espacioOriginalMB<<";"<<promedioDecodificacion<<";" <<espacioCodificadoMB<<"\n";
         archivoCSV.close();
     }
 

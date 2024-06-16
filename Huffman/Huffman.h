@@ -7,6 +7,7 @@
 #include <utility>
 #include <algorithm>
 
+#include "compareNode.h"
 #include "node.h"
 
 using namespace std;
@@ -16,7 +17,7 @@ private:
     node* ARBOL;
     unordered_map<string, node*> elementos;
     unordered_map<string, string> codigos;
-    map<pair<string, string>, int> vertices;
+    size_t tamañoCodificado;
 
     unordered_map<char, int> obtenerFrecuencias(const string& cadena) {
         unordered_map<char, int> f;
@@ -24,16 +25,6 @@ private:
             f[e]++;
         }
         return f;
-    }
-
-    vector<node*> ordenar(const unordered_map<char, int>& frecuencias) {
-        vector<node*> listaDeNodos;
-        for (const auto& e : frecuencias) {
-            node* nodo = new node(string(1, e.first), e.second);
-            listaDeNodos.push_back(nodo);
-        }
-        sort(listaDeNodos.begin(), listaDeNodos.end(), [](node* a, node* b) {return a->frecuencia < b->frecuencia;});
-        return listaDeNodos;
     }
 
     node* generaNuevoNodo(node* n1, node* n2) {
@@ -82,22 +73,6 @@ private:
         }
         return nombreYCodigo;
     }
-/**
- * Crea un mapa de vértices (pares de nombres de nodos) con su frecuencia en un árbol binario.
- */
-    map<pair<string, string>, int> obtenerVertices(node* nodo, node* padre) {
-        if (padre != nullptr) {
-            vertices[make_pair(padre->nombre, nodo->nombre)] = nodo->frecuencia;
-        }
-        if (nodo->izquierda != nullptr) {
-            obtenerVertices(nodo->izquierda, nodo);
-        }
-        if (nodo->derecha != nullptr) {
-            obtenerVertices(nodo->derecha, nodo);
-        }
-        return vertices;
-    }
-
 public:
     Huffman() : ARBOL(nullptr) {}
 
@@ -114,30 +89,40 @@ public:
     }
 
     void construirArbol(const string& cadena) {
-        unordered_map<char, int> frec = obtenerFrecuencias(cadena);
-        vector<node*> lista = ordenar(frec);
+    unordered_map<char, int> frec = obtenerFrecuencias(cadena); // O(length(cadena))
 
-        while (lista.size() > 1) {
-            node* nuevo = generaNuevoNodo(lista[0], lista[1]);
-            lista.erase(lista.begin());
-            lista.erase(lista.begin());
-            lista.push_back(nuevo);
-            sort(lista.begin(), lista.end(), [](node* a, node* b) {
-                return a->frecuencia < b->frecuencia;
-            });
-        }
+    priority_queue<node*, vector<node*>, CompareNode> pq; //minHeap por cantidad de frecuencia de caracter
 
-        ARBOL = lista[0];
-        generaCodigos(ARBOL);
-        elementos = obtenerDiccNodos(ARBOL, elementos);
-        codigos = obtenerMapaDeCodigos(elementos);  
+    for (const auto& pair : frec) { // O(cantidad de caracteres distintos)
+        node* nodo = new node(string(1, pair.first), pair.second);
+        pq.push(nodo); // O(log k) donde k es el número de elementos en la cola de prioridad
     }
+
+    while (pq.size() > 1) { // O(cantidad de caracteres distintos* logk)
+        node* n1 = pq.top(); // O(1)
+        pq.pop(); // O(log k)
+
+        node* n2 = pq.top(); // O(1)
+        pq.pop(); // O(log k)
+
+        node* nuevo = generaNuevoNodo(n1, n2); // O(1)
+        pq.push(nuevo); // O(log k)
+    }
+
+    ARBOL = pq.top(); // O(1)
+    pq.pop(); // O(log k)
+
+    generaCodigos(ARBOL); // O(cantidad de nodos)
+    elementos = obtenerDiccNodos(ARBOL, elementos); //O(cantidad de nodos)
+    codigos = obtenerMapaDeCodigos(elementos); // O(size(elementos))
+}
 
     string codificar(const string& texto) {
         string huffman = "";
         for (char e : texto) {
             huffman += codigos[string(1, e)];
         }
+        this->tamañoCodificado=huffman.length();
         return huffman;
     }
 
@@ -146,29 +131,31 @@ public:
     }
 
     string descomprime(node* arbol, const string& codigo) {
-        node* original = arbol;
-        string msj = "";
-        for (char c : codigo) {
-            if (c == '0') {
-                if (arbol->izquierda != nullptr && arbol->izquierda->nombre.size() == 1) {
-                    msj += arbol->izquierda->nombre;
-                    arbol = original;
-                } else {
-                    arbol = arbol->izquierda;
-                }
+    node* original = arbol;
+    string msj = "";
+
+    for (char c : codigo) {
+        if (c == '0') {
+            if (arbol->izquierda != nullptr && arbol->izquierda->nombre.size() == 1) {
+                msj += arbol->izquierda->nombre;
+                arbol = original;
             } else {
-                if (arbol->derecha != nullptr && arbol->derecha->nombre.size() == 1) {
-                    msj += arbol->derecha->nombre;
-                    arbol = original;
-                } else {
-                    arbol = arbol->derecha;
-                }
+                arbol = arbol->izquierda;
+            }
+        } else {
+            if (arbol->derecha != nullptr && arbol->derecha->nombre.size() == 1) {
+                msj += arbol->derecha->nombre;
+                arbol = original;
+            } else {
+                arbol = arbol->derecha;
             }
         }
-        return msj;
     }
 
-    map<pair<string, string>, int> obtenerAristas() {
-        return obtenerVertices(ARBOL, nullptr);
+    return msj;
+}
+    double tamañoCodificadoEnMB(){
+        return (double)(tamañoCodificado/8/(1e6));
     }
+
 };
