@@ -17,11 +17,18 @@ size_t memoria_usada(const vector<code>& v){
 	return v.size()* sizeof(code);
 }
 
+// Función para convertir bytes a KB y MB
+string convertir_tamaño(size_t size) {
+    return to_string(size / (1024.0 * 1024.0)) + " MB";
+}
+
 code find(string lab, string sb, int labs, int sbs){
+
 	code sol;
 	sol.o=0;
 	sol.l= 0;
 	sol.c= lab[0];
+	
 	for(int j=sb.size()-1; j>=0; j--){
 		if(lab[0]== sb[j]){
 			int k=1, z= j+1, x= 0;
@@ -52,6 +59,8 @@ code find(string lab, string sb, int labs, int sbs){
 	}
 	return sol;
 }
+
+
 vector<code> encoding(string text, int labs, int sbs){
 	string lab, sb="";
 	int i=0; 
@@ -83,6 +92,7 @@ vector<code> encoding(string text, int labs, int sbs){
 	}
 	return v;
 }
+
 string decoding(vector<code> v){
 	string tex= "";
 	for(int i=0; i<v.size(); i++){
@@ -102,16 +112,12 @@ string decoding(vector<code> v){
 	return tex;
 }
 
-void test(const string& text, int labs, int sbs, int n_veces, ofstream &outFile, ofstream &outFile_1) {
+void test(const string& text, int labs, int sbs, int n_veces, ofstream &outFile,size_t tamaño_txtoriginal) {
 	if(!outFile){
 		std::cerr << "No se pudo abrir el archivo para escritura." << endl;
 		return;
 	}
-	else if(!outFile_1){
-		std::cerr << "No se pudo abrir el archivo para escritura." << endl;
-		return;
-	}
-	
+
 
     for (int i = 0; i < n_veces; i++) {
         auto start = high_resolution_clock::now();
@@ -122,10 +128,7 @@ void test(const string& text, int labs, int sbs, int n_veces, ofstream &outFile,
 
         size_t memoria = memoria_usada(op);
 
-        
-
-        outFile << "Test " << "Tiempo de Codificacion por compresion en ms " << "Memoria usada en bytes" << endl;
-        outFile << i + 1 << "," << duration.count() << "," << memoria << endl;
+        outFile << i + 1 << "," << "LZ77" << "," << "comprimir" << "," << convertir_tamaño(tamaño_txtoriginal) << "," << duration.count() << "," << convertir_tamaño(memoria) << endl;
 
         auto start_decoding = high_resolution_clock::now();
         string tex = decoding(op);
@@ -143,50 +146,60 @@ void test(const string& text, int labs, int sbs, int n_veces, ofstream &outFile,
             }
         }
         double Porcentaje_Igualdad = (static_cast<double>(contador) / LongitudMax) * 100.0;
+		if(Porcentaje_Igualdad >= 90){
+        	outFile << i + 1 << "," << "LZ77" << "," << "descomprimir" << "," << convertir_tamaño(tamaño_txtoriginal) << "," << duration_decoding.count() << "," << convertir_tamaño(memoria) << endl;
 
-        outFile_1 << "Test" << "," << "Tiempo de Decodificacion por Compresion en ms" << "," << "Porcentaje de igualdad con texto original" << endl;
-        outFile_1 << i + 1 << "," << duration_decoding.count() << "," << Porcentaje_Igualdad << endl;
-
-        
+        }
+        else{
+        	outFile << i + 1 << "," << "LZ77" << "," << "descomprimir" << "," << "descomprimir bajo 90 porciento de eficiencia"<< endl;
+		return;
+        } 
     }
 }
 
 
 int main(){
 	int ws, labs, sbs;
+	string rutaArchivoOriginal = "english_12MB.txt";
+	//32768  Tamaño de la ventana de 32 KB con buenos resultados
+	//16000 Tamaño de la ventana da memoria muy alta pero tiempos mas cortos
 	cout<<"Ingrese el tamaño de la Ventana: ";
 	cin>>ws;
+	//4096 Tamaño del buffer de búsqueda de 4 KB con buenos resultados
+	//16000 Tamaño del buffer da memoria muy alta pero tiempos mas cortos
+
 	cout<<"Ingrese el tamaño del Buffer: ";
 	cin>>labs;
 	sbs= ws-labs;
-	
-	//no funciona con textoOriginal.txt por que es demasiado grande
-	//de momento con acrhivos de 10 mb funciona
-	string text = leerArchivo("prueba.txt");
-	if (text.empty()) {
-        cerr << "No se pudo leer el archivo de texto." << endl;
-        return 1;
-    }
 
-	ofstream Codificar("codificar.csv");
-	if (!Codificar.is_open()) {
+	ofstream LZ77("LZ77.csv");
+	if (!LZ77.is_open()) {
         cerr << "No se pudo abrir el archivo codificar.csv para escritura." << endl;
         return 1;
     }
-	ofstream Decodificar("decodificar.csv");
-	if (!Decodificar.is_open()) {
-        cerr << "No se pudo abrir el archivo decodificar.csv para escritura." << endl;
-        return 1;
-    }
+
+    LZ77 << "cant_experimento "<< "," << "estructura_dato " << "," << "tipo_consulta" << "," << "Tamaño_en_MB " << "," << "tiempo_promedio" << "," << "espacio_ocupado_en_MB" << endl;
 
 	int n_veces;
     cout << "Ingrese el numero de test a realizar";
     cin >> n_veces;
+	vector<size_t> tamañosEnMB = {1,3,5,7,10};
 
-    test(text, labs, sbs, n_veces,Codificar,Decodificar);
+	 for (size_t tamañoMB : tamañosEnMB) {
+        size_t tamanioEnBytes = tamañoMB * 1e6; // Convertir MB a bytes
+        string text = leerArchivo(rutaArchivoOriginal, tamanioEnBytes);
+		size_t textoOriginalTmaño = text.length();
 
-	Codificar.close();
-	Decodificar.close();
+        if (text.empty()) {
+            cerr << "No se pudo leer el archivo de texto." << endl;
+            continue;
+        }
+
+        test(text, labs, sbs, n_veces, LZ77 ,textoOriginalTmaño);
+
+    }
+
+	LZ77.close();
 
 	return 0;
 
