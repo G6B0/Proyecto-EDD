@@ -183,8 +183,17 @@ int main(){
 	cout<<"Ingrese el tamaño del Buffer: ";
 	cin>>labs;
 	sbs= ws-labs;
+    size_t tamanioEnBytes = 50000; // Convertir MB a bytes
+    string text = leerArchivo(rutaArchivoOriginal, tamanioEnBytes);
+	size_t textoOriginalTmaño = text.length();
+    vector<code> op = encoding(text, labs, sbs);
 
-	ofstream LZ77("LZ77.csv");
+     // Mostrar resultados
+    cout << "Texto original (50bytes): " << text.size() << " caracteres\n";
+    cout << "Texto comprimido: " << op.size()*9 << " triplets\n";
+
+
+	/*ofstream LZ77("LZ77.csv");
 	if (!LZ77.is_open()) {
         cerr << "No se pudo abrir el archivo codificar.csv para escritura." << endl;
         return 1;
@@ -207,6 +216,6 @@ int main(){
         test(text, labs, sbs, 20, LZ77 ,textoOriginalTmaño);
 
     }
-	LZ77.close();
+	LZ77.close();*/
 	return 0;
 }
