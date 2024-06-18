@@ -1,0 +1,8 @@
+cant_experimento;estructura_dato;tipo_consulta;tamaño_ingreasado_en_MB;tiempo_promedio;espacio_ocupado_en_MB
+1,LZ77,comprimir,0.979856,1147148,6.073992
+20;LZ77;comprimir,0.979856;57357.4;6.073992
+20;LZ77;descomprimir;0.979856;1.03318e+07;6.073992
+2,LZ77,comprimir,0.979856,1010553,6.073992
+20;LZ77;comprimir,0.979856;107885;6.073992
+20;LZ77;descomprimir;0.979856;2.08282e+07;6.073992
+3,LZ77,comprimir,0.979856,974404,6.073992

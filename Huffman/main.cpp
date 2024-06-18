@@ -26,7 +26,7 @@ int main() {
         cerr << "No se pudo abrir el archivo CSV para escribir la cabecera." << endl;
         return 1;
     }
-    archivoCSV << "cant_experimento;estructura_dato;tipo_consulta;largo_string_ingresado_en_MB;tiempo_promedio;tamaño_codificado_en_MB\n";
+    archivoCSV << "cant_experimento;estructura_dato;tipo_consulta;tamaño_ingreasado_en_MB;tiempo_promedio;espacio_ocupado_en_MB\n";
     archivoCSV.close();
 
     for (size_t tamañoMB : tamañosEnMB) {

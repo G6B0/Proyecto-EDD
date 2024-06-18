@@ -8,6 +8,7 @@
 
 using namespace std::chrono;
 using namespace std;
+
 struct code{
 	int o, l;
 	char c;
@@ -19,7 +20,7 @@ size_t memoria_usada(const vector<code>& v){
 
 // Función para convertir bytes a KB y MB
 string convertir_tamaño(size_t size) {
-    return to_string(size / (1e6)) + " MB";
+    return to_string(size / (1e6));
 }
 
 code find(string lab, string sb, int labs, int sbs){
@@ -112,12 +113,14 @@ string decoding(vector<code> v){
 	return tex;
 }
 
-void test(const string& text, int labs, int sbs, int n_veces, ofstream &outFile,size_t tamaño_txtoriginal) {
-	if(!outFile){
-		std::cerr << "No se pudo abrir el archivo para escritura." << endl;
-		return;
-	}
-
+void test(const string& text, int labs, int sbs, int n_veces, ofstream &outFile, size_t tamaño_txtoriginal) {
+    vector<long long> tiemposCodificacion;
+    vector<long long> tiemposDecodificacion;
+    size_t memoriaUsada;
+    if (!outFile) {
+        std::cerr << "No se pudo abrir el archivo para escritura." << endl;
+        return;
+    }
 
     for (int i = 0; i < n_veces; i++) {
         auto start = high_resolution_clock::now();
@@ -125,36 +128,45 @@ void test(const string& text, int labs, int sbs, int n_veces, ofstream &outFile,
         auto stop = high_resolution_clock::now();
 
         auto duration = duration_cast<microseconds>(stop - start);
+        tiemposCodificacion.push_back(duration.count());
 
         size_t memoria = memoria_usada(op);
-
-        outFile << i + 1 << "," << "LZ77" << "," << "comprimir" << "," << convertir_tamaño(tamaño_txtoriginal) << "," << duration.count() << "," << convertir_tamaño(memoria) << endl;
+        memoriaUsada = memoria;
 
         auto start_decoding = high_resolution_clock::now();
         string tex = decoding(op);
         auto stop_decoding = high_resolution_clock::now();
         auto duration_decoding = duration_cast<microseconds>(stop_decoding - start_decoding);
+        tiemposDecodificacion.push_back(duration_decoding.count());
 
-		int LongitudMin = std::min(text.size(), tex.size());
+        int LongitudMin = std::min(text.size(), tex.size());
         int LongitudMax = std::max(text.size(), tex.size());
 
         int contador = 0;
 
         for (int i = 0; i < LongitudMin; ++i) {
-        if (text[i] == tex[i]) {
-            contador++;
+            if (text[i] == tex[i]) {
+                contador++;
             }
         }
         double Porcentaje_Igualdad = (static_cast<double>(contador) / LongitudMax) * 100.0;
-		if(Porcentaje_Igualdad >= 90){
-        	outFile << i + 1 << "," << "LZ77" << "," << "descomprimir" << "," << convertir_tamaño(tamaño_txtoriginal) << "," << duration_decoding.count() << "," << convertir_tamaño(memoria) << endl;
-
+        if (Porcentaje_Igualdad < 90) {
+            outFile << i + 1 << "," << "LZ77" << "," << "descomprimir" << "," << "descomprimir bajo 90 porciento de eficiencia" << endl;
+            return;
         }
-        else{
-        	outFile << i + 1 << "," << "LZ77" << "," << "descomprimir" << "," << "descomprimir bajo 90 porciento de eficiencia"<< endl;
-		return;
-        } 
     }
+
+    long long sumaCodificacion = 0;
+    long long sumaDecodificacion = 0;
+    for(int i=0;i<tiemposCodificacion.size();i++){
+        sumaCodificacion+=tiemposCodificacion[i];
+        sumaDecodificacion+=tiemposDecodificacion[i];
+    }
+    double promedioCodificacion = static_cast<double>(sumaCodificacion) / n_veces;
+    double promedioDecodificacion = static_cast<double>(sumaDecodificacion) / n_veces;
+
+    outFile<<n_veces<<";"<<"LZ77"<<";"<<"comprimir"<<";"<<convertir_tamaño(tamaño_txtoriginal)<<";"<<promedioCodificacion<<";"<< convertir_tamaño(memoriaUsada)<<endl;
+    outFile<<n_veces<<";"<<"LZ77"<<";"<<"descomprimir"<<";"<<convertir_tamaño(tamaño_txtoriginal) <<";"<<promedioDecodificacion<<";"<< convertir_tamaño(memoriaUsada)<<endl;
 }
 
 
@@ -178,11 +190,8 @@ int main(){
         return 1;
     }
 
-    LZ77 << "cant_experimento "<< "," << "estructura_dato " << "," << "tipo_consulta" << "," << "Tamaño_en_MB " << "," << "tiempo_promedio" << "," << "espacio_ocupado_en_MB" << endl;
+    LZ77<<"cant_experimento"<<";"<<"estructura_dato"<<";"<<"tipo_consulta"<<";"<<"tamaño_ingreasado_en_MB"<<";"<<"tiempo_promedio"<<";"<<"espacio_ocupado_en_MB"<<endl;
 
-	int n_veces;
-    cout << "Ingrese el numero de test a realizar";
-    cin >> n_veces;
 	vector<size_t> tamañosEnMB = {1,3,5,7,10};
 
 	 for (size_t tamañoMB : tamañosEnMB) {
@@ -195,12 +204,9 @@ int main(){
             continue;
         }
 
-        test(text, labs, sbs, n_veces, LZ77 ,textoOriginalTmaño);
+        test(text, labs, sbs, 20, LZ77 ,textoOriginalTmaño);
 
     }
-
 	LZ77.close();
-
 	return 0;
-
 }
