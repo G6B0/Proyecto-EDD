@@ -76,10 +76,13 @@ static string decompress(const CompressedData &compressed) {
 int main() {
 string rutaArchivoOriginal = "english_12MB.txt";
 
-size_t tamanioEnBytes = 50000; // con 50k porque con más se demora
+size_t tamanioEnBytes = 100000; 
 
 string text = leerArchivo(rutaArchivoOriginal, tamanioEnBytes);
 
+for(int i=0; i < 10 ;i++){
+text=text+text;
+}
 if (text.empty()) {
     cerr << "Error al leer el archivo o archivo vacío." << endl;
     return 1;

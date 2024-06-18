@@ -7,6 +7,7 @@
 #include "leerArchivo.h"
 
 using namespace std::chrono;
+
 using namespace std;
 
 struct code{
@@ -183,13 +184,15 @@ int main(){
 	cout<<"Ingrese el tamaño del Buffer: ";
 	cin>>labs;
 	sbs= ws-labs;
-    size_t tamanioEnBytes = 50000; // Convertir MB a bytes
+    size_t tamanioEnBytes = 100000; // Convertir MB a bytes
     string text = leerArchivo(rutaArchivoOriginal, tamanioEnBytes);
+
+    
 	size_t textoOriginalTmaño = text.length();
     vector<code> op = encoding(text, labs, sbs);
 
      // Mostrar resultados
-    cout << "Texto original (50bytes): " << text.size() << " caracteres\n";
+    cout << "Texto original (EN bytes): " << text.size() << " caracteres\n";
     cout << "Texto comprimido: " << op.size()*9 << " triplets\n";
 
 
