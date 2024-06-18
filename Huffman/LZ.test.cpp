@@ -74,37 +74,37 @@ static string decompress(const CompressedData &compressed) {
 };
 
 int main() {
-string rutaArchivoOriginal = "english_12MB.txt";
+    string rutaArchivoOriginal = "english_12MB.txt";
 
-size_t tamanioEnBytes = 100000; 
+    size_t tamanioEnBytes = 100000; 
 
-string text = leerArchivo(rutaArchivoOriginal, tamanioEnBytes);
+    string text = leerArchivo(rutaArchivoOriginal, tamanioEnBytes);
+    string duplicados;
 
-for(int i=0; i < 10 ;i++){
-text=text+text;
-}
-if (text.empty()) {
-    cerr << "Error al leer el archivo o archivo vacío." << endl;
-    return 1;
-}
+    for(int i = 0; i < 7; i++) { //100000 * 2^5 = 3.2MB, 100000 * 2^7 = 6.4MB
+        text += text;
+    }
 
-size_t textoOriginalTamaño = text.length();
+    if (text.empty()) {
+        cerr << "Error al leer el archivo o archivo vacío." << endl;
+        return 1;
+    }
 
-LempelZiv::CompressedData compressedData = LempelZiv::compress(text);
+    size_t textoOriginalTamaño = text.length();
 
+    LempelZiv::CompressedData compressedData = LempelZiv::compress(text);
 
-cout << "Texto original (caracteres): " << textoOriginalTamaño << endl;
-cout << "Texto comprimido: " << compressedData.size() * sizeof(pair<int, int>) << " bytes" << endl;
+    cout << "Texto original (caracteres): " << textoOriginalTamaño <<"bytes"<< endl;
+    cout << "Texto comprimido: " << compressedData.size() * sizeof(pair<int, int>) << " bytes" << endl;
 
-string decompressedText = LempelZiv::decompress(compressedData);
-cout << "Texto descomprimido (caracteres): " << decompressedText.size() << endl;
+    string decompressedText = LempelZiv::decompress(compressedData);
+    cout << "Texto descomprimido (caracteres): " << decompressedText.size() << endl;
 
+    if (text == decompressedText) {
+        cout << "La descompresión ha sido exitosa." << endl;
+    } else {
+        cout << "La descompresión ha fallado." << endl;
+    }
 
-if (text == decompressedText) {
-    cout << "La descompresión ha sido exitosa." << endl;
-} else {
-    cout << "La descompresión ha fallado." << endl;
-}
-
-return 0;
+    return 0;
 }
