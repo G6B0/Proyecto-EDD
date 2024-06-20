@@ -6,6 +6,8 @@
 #include <map>
 #include <utility>
 #include <algorithm>
+#include <bitset>
+#include <stdexcept>
 
 #include "compareNode.h"
 #include "node.h"
@@ -129,7 +131,39 @@ public:
     string decodificar(const string& codigo) {
         return descomprime(ARBOL, codigo);
     }
+    vector<uint32_t> codificarAEnteros(const string& bitString) {
+        vector<uint32_t> enteros;
 
+        for (size_t i = 0; i < bitString.size(); i += 32) {
+            string fragmento = bitString.substr(i, 32);
+            while (fragmento.length() < 32) {
+                fragmento += '0';
+            }
+            uint32_t entero = bitset<32>(fragmento).to_ulong();
+            enteros.push_back(entero);
+        }
+
+        return enteros;
+    }
+
+
+    string decodificarDesdeEnteros(const vector<uint32_t>& enteros, size_t longitudBits) {
+        string bitString = "";
+        for (uint32_t entero : enteros) {
+            bitString += bitset<32>(entero).to_string();
+        }
+
+        bitString = bitString.substr(0, longitudBits);
+        return decodificar(bitString);
+    }
+
+    size_t getTamañoCodificado() const {
+        return tamañoCodificado;
+    }
+
+    double tamañoCodificadoEnMB() const {
+        return static_cast<double>(tamañoCodificado) / 8.0 / (1e6);
+    }
     string descomprime(node* arbol, const string& codigo) {
     node* original = arbol;
     string msj = "";
@@ -154,8 +188,5 @@ public:
 
     return msj;
 }
-    double tamañoCodificadoEnMB(){
-        return (double)(tamañoCodificado/8/(1e6));
-    }
 
 };

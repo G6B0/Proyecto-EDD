@@ -81,7 +81,7 @@ int main() {
     string text = leerArchivo(rutaArchivoOriginal, tamanioEnBytes);
     string duplicados;
 
-    for(int i = 0; i < 7; i++) { //100000 * 2^5 = 3.2MB, 100000 * 2^7 = 6.4MB
+    for(int i = 0; i < 7; i++) { //100000 * 2^5 = 3.2MB, 100000 * 2^7 = APROX 12.6MB
         text += text;
     }
 
