@@ -75,22 +75,7 @@ private:
         }
         return nombreYCodigo;
     }
-public:
-    Huffman() : ARBOL(nullptr) {}
-
-    ~Huffman() {
-        limpiarArbol(ARBOL);
-    }
-
-    void limpiarArbol(node* nodo) {
-        if (nodo != nullptr) {
-            limpiarArbol(nodo->izquierda);
-            limpiarArbol(nodo->derecha);
-            delete nodo;
-        }
-    }
-
-    void construirArbol(const string& cadena) {
+void construirArbol(const string& cadena) {
     unordered_map<char, int> frec = obtenerFrecuencias(cadena); // O(length(cadena))
 
     priority_queue<node*, vector<node*>, CompareNode> pq; //minHeap por cantidad de frecuencia de caracter
@@ -119,19 +104,7 @@ public:
     codigos = obtenerMapaDeCodigos(elementos); // O(size(elementos))
 }
 
-    string codificar(const string& texto) {
-        string huffman = "";
-        for (char e : texto) {
-            huffman += codigos[string(1, e)];
-        }
-        this->tamañoCodificado=huffman.length();
-        return huffman;
-    }
-
-    string decodificar(const string& codigo) {
-        return descomprime(ARBOL, codigo);
-    }
-    vector<uint32_t> codificarAEnteros(const string& bitString) {
+vector<uint32_t> codificarAEnteros(const string& bitString) {
         vector<uint32_t> enteros;
 
         for (size_t i = 0; i < bitString.size(); i += 32) {
@@ -145,8 +118,6 @@ public:
 
         return enteros;
     }
-
-
     string decodificarDesdeEnteros(const vector<uint32_t>& enteros, size_t longitudBits) {
         string bitString = "";
         for (uint32_t entero : enteros) {
@@ -154,7 +125,7 @@ public:
         }
 
         bitString = bitString.substr(0, longitudBits);
-        return decodificar(bitString);
+        return descomprime(ARBOL, bitString);
     }
 
     size_t getTamañoCodificado() const {
@@ -188,5 +159,34 @@ public:
 
     return msj;
 }
+
+public:
+    Huffman() : ARBOL(nullptr) {}
+
+    ~Huffman() {
+        limpiarArbol(ARBOL);
+    }
+
+    void limpiarArbol(node* nodo) {
+        if (nodo != nullptr) {
+            limpiarArbol(nodo->izquierda);
+            limpiarArbol(nodo->derecha);
+            delete nodo;
+        }
+    }
+
+    vector<uint32_t> codificar(const string& texto) {
+        construirArbol(texto);
+        string huffman = "";
+        for (char e : texto) {
+            huffman += codigos[string(1, e)];
+        }
+        this->tamañoCodificado=huffman.length();
+        return codificarAEnteros(huffman);
+    }
+
+    string decodificar(vector<uint32_t> codificadoEnEnteros) {
+        return decodificarDesdeEnteros(codificadoEnEnteros,tamañoCodificado);
+    }
 
 };

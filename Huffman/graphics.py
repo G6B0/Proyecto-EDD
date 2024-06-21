@@ -5,7 +5,7 @@ import pandas as pd
 df = pd.read_csv('Huffman/resultados.csv', sep=';')
 
 # Convertir los tipos de datos
-df['tamaño_en_MB'] = df['tamaño_ingreasado_en_MB'].astype(int)
+df['tamaño_en_MB'] = df['tamaño_ingreasado_en_MB'].astype(float)
 df['tiempo_promedio'] = df['tiempo_promedio'].astype(float)
 
 # Crear las curvas para codificación y decodificación
