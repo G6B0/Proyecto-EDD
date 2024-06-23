@@ -1,0 +1,17 @@
+cant_experimento;estructura_dato;tipo_consulta;tamaño_ingreasado_en_MB;tiempo_promedio;espacio_salida_en_MB
+20;Huffman;codificacion;0.078325;13940;0.044348
+20;Huffman;decodificacion;0.044348;6700.45;0.078325
+20;Huffman;codificacion;0.15665;26837.3;0.088696
+20;Huffman;decodificacion;0.088696;13444.6;0.15665
+20;Huffman;codificacion;0.3133;52307.8;0.177392
+20;Huffman;decodificacion;0.177392;26780.8;0.3133
+20;Huffman;codificacion;0.6266;102859;0.354784
+20;Huffman;decodificacion;0.354784;54169.7;0.6266
+20;Huffman;codificacion;1.2532;204682;0.709564
+20;Huffman;decodificacion;0.709564;108841;1.2532
+20;Huffman;codificacion;2.5064;403161;1.41913
+20;Huffman;decodificacion;1.41913;215556;2.5064
+20;Huffman;codificacion;5.0128;854752;2.83826
+20;Huffman;decodificacion;2.83826;458251;5.0128
+20;Huffman;codificacion;10.0256;1.67245e+06;5.67651
+20;Huffman;decodificacion;5.67651;909082;10.0256
