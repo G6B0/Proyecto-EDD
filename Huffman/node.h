@@ -3,6 +3,8 @@
 
 using namespace std;
 
+/*Estructura node representara el arbol de Huffman almacenara nombre, frecuencia y secuencia en bits correspondiente
+Además del puntero al hijo izquierdo y derecho */
 class node {
 public:
     string nombre;        // nombre del string 

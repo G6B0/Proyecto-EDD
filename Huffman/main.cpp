@@ -8,50 +8,17 @@
 using namespace std;
 using namespace std::chrono;
 
+
+/**Funcion para verificar si la decodifcacion fue exitosa
+ * Función auxiliar
+*/
 bool verificarCodificacion(Huffman& huffman, const string& textoOriginal) {
     vector<uint32_t> textoCodificado = huffman.codificar(textoOriginal);
     string textoDecodificado = huffman.decodificar(textoCodificado);
     return textoOriginal == textoDecodificado;
 }
-    /*string rutaArchivoOriginal = "english_12MB.txt";
-    string nombreArchivoCSV = "resultados.csv";
-    vector<size_t> tamañosEnMB = {1, 3, 5, 7, 10};
-    int numRepeticiones = 20;
-    size_t tamanioEnBytes = 10 * 1e6;
 
-    try {
-        // Leer el archivo
-        string textoOriginal = leerArchivo(rutaArchivoOriginal, tamanioEnBytes);
-        size_t textoOriginalTamaño = textoOriginal.length();
-
-        Huffman huffman;
-
-
-        vector<uint32_t> codificado = huffman.codificar(textoOriginal);
-
-
-        cout << "Espacio del string original: " << textoOriginalTamaño << " bytes" << endl;
-        cout << "Espacio usado codificado" << codificado.size()*sizeof(uint32_t) << " bytes" << endl;
-
-
-        string textoDecodificado = huffman.decodificar(codificado);
-        size_t tamañoOriginalBytes = textoOriginalTamaño * sizeof(char);
-        size_t tamañoCodificadoBytes = codificado.size()*sizeof(uint32_t);
-
-
-        double reducciónPorcentaje = ((double)(tamañoOriginalBytes - tamañoCodificadoBytes) / tamañoOriginalBytes) * 100;
-
-
-        if (textoOriginal == textoDecodificado) {
-            cout << "La decodificación fue exitosa, se redujo un: "<< reducciónPorcentaje<<"%"<<endl;
-        } else {
-            cout << "La decodificación falló." << endl;
-        }
-    } catch (const runtime_error& e) {
-        cerr << e.what() << endl;
-        return 1;
-    }*/
-
+/*Experimentación explicada en el informe */
 int main() {
 
     string rutaArchivoOriginal = "english_12MB.txt";

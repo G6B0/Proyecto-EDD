@@ -14,6 +14,12 @@
 
 using namespace std;
 /*Codigo sacado de:  https://gist.github.com/pepgonzalez/5360217 */
+
+/**
+ * Clase Huffman tendrá un node que sera el arbol Huffman construido
+ * una tabla hash de elementos, guardara el nombre asociado a cada nodo
+ * codigos, tendra cada secuencia de bits de cada caracter
+ */
 class Huffman {
 private:
     node* ARBOL;
@@ -21,6 +27,9 @@ private:
     unordered_map<string, string> codigos;
     size_t tamañoCodificado;
 
+    /**Almacena la frecuencia de cada caracter de un string ingresado y los guarda en una
+     * tabla hash
+     */
     unordered_map<char, int> obtenerFrecuencias(const string& cadena) {
         unordered_map<char, int> f;
         for (char e : cadena) {
@@ -28,7 +37,9 @@ private:
         }
         return f;
     }
-
+    /**Combina un nuevo nodo, sumando sus frecuencias, combinando sus nombres(esto util para diferencia de hoja y no hoja)
+     * ademas de fija el codigo para el nodo izquierdo que seria 0 y derecho 0(por definicion)
+     */
     node* generaNuevoNodo(node* n1, node* n2) {
         string nombre = n1->nombre + n2->nombre;
         int suma = n1->frecuencia + n2->frecuencia;
@@ -37,7 +48,8 @@ private:
         node* nuevo = new node(nombre, suma, n1, n2);
         return nuevo;
     }
-
+    /*Genera los codigos de cada nodo recursivamente
+    esto se hace concatenando el nodo padre con su hijo(0 o 1) */
     void generaCodigos(node* r) {
         if (r->izquierda != nullptr) {
             r->izquierda->codigo = r->codigo + r->izquierda->codigo;
@@ -49,7 +61,7 @@ private:
         }
     }
 /**
- * guarda cada nodo del arbor en una tabla hash 
+ * guarda cada nodo del arbor en una tabla hash, con clave el nombre del nodo
  */
     unordered_map<string, node*> obtenerDiccNodos(node* r, unordered_map<string, node*>& elementos) {
         if (elementos.find(r->nombre) == elementos.end()) {
@@ -75,10 +87,15 @@ private:
         }
         return nombreYCodigo;
     }
+
+    /**
+     * Construye el arbol Huffman con ayuda de una cola de prioridad
+     * Genera los codigos correspondientes y los almacena en una tabla hash
+     */
 void construirArbol(const string& cadena) {
     unordered_map<char, int> frec = obtenerFrecuencias(cadena); // O(length(cadena))
 
-    priority_queue<node*, vector<node*>, CompareNode> pq; //minHeap por cantidad de frecuencia de caracter
+    priority_queue<node*, vector<node*>, CompareNode> pq; //cola de prioridad de mayor prioridad la menores frecuencia
 
     for (const auto& pair : frec) { // O(cantidad de caracteres distintos)
         node* nodo = new node(string(1, pair.first), pair.second);
@@ -104,6 +121,9 @@ void construirArbol(const string& cadena) {
     codigos = obtenerMapaDeCodigos(elementos); // O(size(elementos))
 }
 
+/*Convierte a enteros de 32 bits sin signo, se divide la secuendia de bits codificada
+en fragmentos de 32 de largo, si es menor se rellena con 0´s */
+
 vector<uint32_t> codificarAEnteros(const string& bitString) {
         vector<uint32_t> enteros;
 
@@ -118,6 +138,10 @@ vector<uint32_t> codificarAEnteros(const string& bitString) {
 
         return enteros;
     }
+    /**
+     * decodifica los enteros del vector a secuencia de bits en sring de longitudBits
+     * para luego descomprimirlo y devolverlo al string original
+     */
     string decodificarDesdeEnteros(const vector<uint32_t>& enteros, size_t longitudBits) {
         string bitString = "";
         for (uint32_t entero : enteros) {
@@ -127,14 +151,10 @@ vector<uint32_t> codificarAEnteros(const string& bitString) {
         bitString = bitString.substr(0, longitudBits);
         return descomprime(ARBOL, bitString);
     }
-
-    size_t getTamañoCodificado() const {
-        return tamañoCodificado;
-    }
-
-    double tamañoCodificadoEnMB() const {
-        return static_cast<double>(tamañoCodificado) / 8.0 / (1e6);
-    }
+    /**
+     * Descomprime el arbol de huffman en forma de posicion(cada hoja se representa por el nombre.size()=1)
+     * cuando se llega a una hoja se agrega el nombre, pues la secuencia de bits representa el camino unico hacia esa hoja
+     */
     string descomprime(node* arbol, const string& codigo) {
     node* original = arbol;
     string msj = "";
@@ -174,7 +194,11 @@ public:
             delete nodo;
         }
     }
-
+/**
+ * Primero construye el arbol huffman para luego codificar
+ * Codifica el string ingresado en la secuencia de bits 
+ * de secuencia de bits enteros de 32 bits almacenados en un vector
+ */
     vector<uint32_t> codificar(const string& texto) {
         construirArbol(texto);
         string huffman = "";
@@ -184,6 +208,10 @@ public:
         this->tamañoCodificado=huffman.length();
         return codificarAEnteros(huffman);
     }
+
+    /**Decoficar el vector de enteros a la secuencia de bits correspondiente al string original
+     * Luego descomprime y lo transforma el string original 
+     */
 
     string decodificar(vector<uint32_t> codificadoEnEnteros) {
         return decodificarDesdeEnteros(codificadoEnEnteros,tamañoCodificado);

@@ -6,7 +6,7 @@
 #include <algorithm>
 
 using namespace std;
-
+/**Lee una archivo .txt para retornarlo en formato string */
 string leerArchivo(const string& rutaArchivo, size_t tamanioEnBytes) {
     ifstream archivo(rutaArchivo, ios::in | ios::binary);
     if (!archivo) {
